@@ -4,80 +4,59 @@ import java.time.LocalDate;
 
 public class Embauche {
 
+    // Attributs
     private LocalDate debut;
-
     private LocalDate fin;
-
     private final Moniteur employe;
-
     private final Club employeur;
 
+    
+    // Constructeur
     public Embauche(LocalDate debut, Moniteur employe, Club employeur) {
         this.debut = debut;
         this.employe = employe;
         this.employeur = employeur;
     }
 
-    /**
-     * Termine cette embauche
-     * @param dateFin la date à laquelle cette embauche est terminée
-     */
+    
+    // terminer()
     public void terminer(LocalDate dateFin) {
-         // TODO: Implémenter cette méthode
-        throw new UnsupportedOperationException("Pas encore implémenté");	    
+        // Exception : on vérifie si la fin est antérieure au début
+        if (dateFin.compareTo(debut) < 0) {
+            throw new IllegalArgumentException("La date de fin d'embauche ne peut pas être antérieure à celle de début d'embauche");
+        }
+        // On fixe la date de fin d'embauche
+        this.setFin(dateFin);
     }
     
-    /**
-     * Est-ce que cette embauche est terminée ?
-     * @return vrai si terminée, faux sinon.
-     */
+    
+    // estTerminee()
     public boolean estTerminee() {
         return (fin != null);
     }
-    /**
-     * Get the value of employeur
-     *
-     * @return the value of employeur
-     */
+    
+    
+    // Getters
     public Club getEmployeur() {
         return employeur;
     }
 
-    /**
-     * Get the value of employe
-     *
-     * @return the value of employe
-     */
     public Moniteur getEmploye() {
         return employe;
     }
 
-    /**
-     * Get the value of fin
-     *
-     * @return the value of fin
-     */
     public LocalDate getFin() {
         return fin;
     }
-
-    /**
-     * Set the value of fin
-     *
-     * @param fin new value of fin
-     */
-    public void setFin(LocalDate fin) {
-        this.fin = fin;
-    }
-
-    /**
-     * Get the value of debut
-     *
-     * @return the value of debut
-     */
+    
     public LocalDate getDebut() {
         return debut;
     }
 
+    
+    // Setters
+    public void setFin(LocalDate fin) {
+        this.fin = fin;
+    }
     
 }

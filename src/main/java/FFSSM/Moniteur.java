@@ -4,41 +4,104 @@
 package FFSSM;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.ArrayList;
 import java.util.Optional;
 
-public class Moniteur extends Personne {
+public class Moniteur extends Plongeur {
 
-    public int numeroDiplome;
+    // Attributs
+    private int numeroDiplome;
+    private ArrayList<Embauche> listeEmbauches;
 
-    public Moniteur(String numeroINSEE, String nom, String prenom, String adresse, String telephone, LocalDate naissance, int numeroDiplome) {
-        super(numeroINSEE, nom, prenom, adresse, telephone, naissance);
+    
+    // Constructeur
+    public Moniteur(String numeroINSEE, String nom, String prenom, String adresse, String telephone, LocalDate naissance, GroupeSanguin gp, int niveau, int numeroDiplome) {
+        super(numeroINSEE, nom, prenom, adresse, telephone, naissance, gp, niveau);
+        setNumeroDiplome(numeroDiplome);
+        this.listeEmbauches = new ArrayList<>();
+    }
+    
+    
+    // Getters
+    public int getNumeroDiplome() {
+        return numeroDiplome;
+    }
+    
+    
+    // Setters
+    public void setNumeroDiplome(int numeroDiplome) {
+        if (numeroDiplome < 0) {
+            throw new IllegalArgumentException("Le numéro du diplême ne peut pas être nul");
+        }
         this.numeroDiplome = numeroDiplome;
     }
 
-    /**
-     * Si ce moniteur n'a pas d'embauche, ou si sa dernière embauche est terminée,
-     * ce moniteur n'a pas d'employeur.
-     * @return l'employeur actuel de ce moniteur sous la forme d'un Optional
-     */
+
+    // employeurActuel()
     public Optional<Club> employeurActuel() {
-         // TODO: Implémenter cette méthode
-        throw new UnsupportedOperationException("Pas encore implémenté");
+        int nbrEmbauches = 0 + listeEmbauches.size();
+        // On vérifie si l'historique d'embauches du moniteur est vide
+        if (nbrEmbauches == 0) {
+            return Optional.ofNullable(null);
+        }
+        else {
+            Embauche embaucheActuelle = listeEmbauches.get(nbrEmbauches - 1);
+            Club employeur = embaucheActuelle.getEmployeur();
+            // On vérifie si le dernier emploi est terminé
+            if (embaucheActuelle.estTerminee() == true) {
+                return Optional.ofNullable(null);
+            }
+            else {
+                return Optional.of(embaucheActuelle.getEmployeur());
+            }
+        }
     }
     
-    /**
-     * Enregistrer une nouvelle embauche pour cet employeur
-     * @param employeur le club employeur
-     * @param debutNouvelle la date de début de l'embauche
-     */
-    public void nouvelleEmbauche(Club employeur, LocalDate debutNouvelle) {   
-         // TODO: Implémenter cette méthode
-        throw new UnsupportedOperationException("Pas encore implémenté");	    
+    
+    // getEmbaucheActuelle()
+    public Embauche getEmbaucheActuelle() throws FFSSMException {
+        // On vérifie si le moniteur a bien un emploi en cours
+        int nbrEmbauches = listeEmbauches.size();
+        if ((nbrEmbauches == 0) || (listeEmbauches.get(nbrEmbauches - 1).estTerminee() == true)) {
+            throw new FFSSMException("Le moniteur n'a actuellement aucun emploi");
+        }
+        else {
+            Embauche derniereEmbauche = listeEmbauches.get(nbrEmbauches - 1);
+            return derniereEmbauche;
+        }
     }
-
-    public List<Embauche> emplois() {
-         // TODO: Implémenter cette méthode
-        throw new UnsupportedOperationException("Pas encore implémenté");
+    
+    
+    
+    // terminerEmbauche()
+    public void terminerEmbauche(LocalDate dateFin) throws FFSSMException {
+        // On vérifie si le moniteur a bien un emploi en cours
+        int nbrEmbauches = listeEmbauches.size();
+        if ((nbrEmbauches == 0) || (listeEmbauches.get(nbrEmbauches - 1).estTerminee() == true)) {
+            throw new FFSSMException("Le moniteur n'a actuellement aucun emploi");
+        }
+        else {
+            Embauche derniereEmbauche = this.getEmbaucheActuelle();
+            derniereEmbauche.terminer(dateFin);
+        }
     }
-
+    
+    
+    // nouvelleEmbauche()
+    public void nouvelleEmbauche(Club employeur, LocalDate debutNouvelle) throws FFSSMException {
+        // On vérifie si le moniteur n'est pas déjà affecté dans un club
+        int nbrEmbauches = listeEmbauches.size();
+        if ((nbrEmbauches >= 1) && (listeEmbauches.get(nbrEmbauches - 1).estTerminee() == false)) {
+            throw new FFSSMException("Le moniteur a déjà une embauche en cours");
+        }
+        Embauche nouvelleEmbauche = new Embauche(debutNouvelle, this, employeur);
+        listeEmbauches.add(nouvelleEmbauche);
+    }
+    
+    
+    // emplois()
+    public ArrayList<Embauche> emplois() {
+        return listeEmbauches;
+    }
+    
 }
